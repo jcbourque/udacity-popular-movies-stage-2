@@ -1,4 +1,23 @@
 <resources>
+    <!--Normal Strings-->
     <string name="app_name">Popular Movies Stage 1</string>
+    <string name="main_title">Popular Movies</string>
+    <string name="detail_title">Movie Detail</string>
     <string name="poster_content_description">Movie Poster</string>
+    <string name="powered_by">Powered by The Movie DB</string>
+    <string name="error_message">Unable to retrieve movie data right now</string>
+
+    <!--Pluralized Strings-->
+    <plurals name="runtime">
+        <item quantity="one">one minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="rating">
+        <item quantity="one">%2$.1f/10 (%1$d vote)</item>
+        <item quantity="other">%2$.1f/10 (%1d votes)</item>
+    </plurals>
+
+    <!--Menu Items-->
+    <string name="menu_popular">View Most Popular</string>
+    <string name="menu_top_rated">View Top Rated</string>
 </resources>

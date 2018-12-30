@@ -1,16 +1,16 @@
 package com.example.android.popularmoviesstage1.utils;
 
 public enum MovieSort {
-    MOST_POPULAR("popularity.desc"),
-    TOP_RATED("vote_average.desc");
+    MOST_POPULAR("popular"),
+    TOP_RATED("top_rated");
 
-    private final String parameterValue;
+    private final String path;
 
     MovieSort(String value) {
-        parameterValue = value;
+        path = value;
     }
 
-    public String getParameterValue() {
-        return  parameterValue;
+    public String getPath() {
+        return path;
     }
 }

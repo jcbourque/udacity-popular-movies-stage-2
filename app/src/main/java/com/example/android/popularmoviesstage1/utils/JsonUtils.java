@@ -2,8 +2,8 @@ package com.example.android.popularmoviesstage1.utils;
 
 import android.util.Log;
 
-import com.example.android.popularmoviesstage1.model.Movie;
-import com.example.android.popularmoviesstage1.model.Result;
+import com.example.android.popularmoviesstage1.data.Movie;
+import com.example.android.popularmoviesstage1.data.Poster;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,33 +18,6 @@ import java.util.Locale;
 public class JsonUtils
 {
     private static final String TAG = "JsonUtils";
-
-    public static Result parseResult(String json) {
-        Result result;
-
-        try {
-            JSONObject data = new JSONObject(json);
-
-            result = new Result();
-
-            result.setPage(data.optInt("page"));
-            result.setTotalResults(data.optInt("total_results"));
-            result.setTotalPages(data.optInt("total_pages"));
-
-            JSONArray movies = data.optJSONArray("results");
-
-            if (movies != null) {
-                for (int i = 0; i < movies.length(); i++) {
-                    result.addMovie(parseMovie(movies.optString(i)));
-                }
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, "parseResult: Unable to parse results", e);
-            result = null;
-        }
-
-        return result;
-    }
 
     public static Movie parseMovie(String json) {
         Movie movie;
@@ -68,12 +41,51 @@ public class JsonUtils
             movie.setAdult(data.optBoolean("adult"));
             movie.setOverview(data.optString("overview"));
             movie.setReleaseDate(toDate(data.optString("release_date"), "yyyy-MM-dd"));
+            movie.setRunTime(data.optInt("runtime"));
         } catch (JSONException e) {
             Log.e(TAG, "parseMovie: Unable to parse movie", e);
             movie = null;
         }
 
         return movie;
+    }
+
+    public static Poster parsePoster(String json) {
+        Poster poster;
+
+        try {
+            JSONObject data = new JSONObject(json);
+
+            poster = new Poster();
+
+            poster.setId(data.optInt("id"));
+            poster.setPath(data.optString("poster_path"));
+            poster.setTitle(data.optString("title"));
+        } catch (JSONException e) {
+            Log.e(TAG, "parsePoster: Unable to parse poster", e);
+            poster = null;
+        }
+
+        return poster;
+    }
+
+    public static List<Poster> parsePosters(String json) {
+        List<Poster> posters = new ArrayList<>();
+
+        try {
+            JSONObject data = new JSONObject(json);
+            JSONArray results = data.optJSONArray("results");
+
+            if (results != null) {
+                for (int i = 0; i < results.length(); i++) {
+                    posters.add(parsePoster(results.optString(i)));
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "parsePosters: Unable to parse posters", e);
+        }
+
+        return posters;
     }
 
     public static Date toDate(String value, String pattern) {

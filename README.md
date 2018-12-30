@@ -1,5 +1,9 @@
 # udacity-popular-movies-stage-1
 
++--------------------------------------------------------------------------+
+| This product uses the TMDb API but is not endorsed or certified by TMDb. |
++--------------------------------------------------------------------------+
+
 This application uses themoviedb.org API, which requires an API key.
 Add a gradle.properties file to the project folder (where this file is located).
 The gradle.properties file is excluded from git via the .gitignore file.
