@@ -91,9 +91,11 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         switch (currentSort) {
             case MOST_POPULAR:
                 mTopRatedMenuItem.setVisible(true);
+                setTitle(R.string.popular_title);
                 break;
             case TOP_RATED:
                 mMostPopularMenuItem.setVisible(true);
+                setTitle(R.string.top_rated_title);
                 break;
         }
 
@@ -109,11 +111,13 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
                 currentSort = MovieSort.MOST_POPULAR;
                 mMostPopularMenuItem.setVisible(false);
                 mTopRatedMenuItem.setVisible(true);
+                setTitle(R.string.popular_title);
                 break;
             case R.id.action_fetch_top_rated:
                 currentSort = MovieSort.TOP_RATED;
                 mTopRatedMenuItem.setVisible(false);
                 mMostPopularMenuItem.setVisible(true);
+                setTitle(R.string.top_rated_title);
                 break;
             default:
                 return super.onOptionsItemSelected(item);

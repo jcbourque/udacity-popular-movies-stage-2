@@ -1,7 +1,8 @@
 <resources>
     <!--Normal Strings-->
     <string name="app_name">Popular Movies Stage 1</string>
-    <string name="main_title">Popular Movies</string>
+    <string name="popular_title">Popular Movies</string>
+    <string name="top_rated_title">Top Rated Movies</string>
     <string name="detail_title">Movie Detail</string>
     <string name="poster_content_description">Movie Poster</string>
     <string name="powered_by">Powered by The Movie DB</string>
