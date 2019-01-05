@@ -2,19 +2,17 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:paddingLeft="20dp"
-    android:paddingRight="0dp"
-    android:paddingStart="20dp"
-    android:paddingEnd="0dp"
-    android:paddingTop="20dp"
+    android:paddingLeft="@dimen/padding_large"
+    android:paddingRight="@dimen/padding_none"
+    android:paddingStart="@dimen/padding_large"
+    android:paddingEnd="@dimen/padding_none"
+    android:paddingTop="@dimen/padding_large"
     android:layout_width="185dp"
     android:layout_height="225dp">
 
-    <ImageView
+    <include layout="@layout/poster"
         android:id="@+id/ivPoster"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/poster_content_description"
-        android:gravity="center"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

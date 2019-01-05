@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.popularmoviesstage1.adapter.EndlessRecyclerViewScrollListener;
+import com.example.android.popularmoviesstage1.adapter.PosterClickListener;
 import com.example.android.popularmoviesstage1.adapter.PosterViewAdapter;
 import com.example.android.popularmoviesstage1.data.FetchPosters;
 import com.example.android.popularmoviesstage1.data.Poster;
@@ -24,7 +25,7 @@ import com.example.android.popularmoviesstage1.utils.MovieSort;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PosterViewAdapter.ItemClickListener,
+public class MainActivity extends AppCompatActivity implements PosterClickListener,
         EndlessRecyclerViewScrollListener.LoadHandler {
     private static final String TAG = "MainActivity";
     private static Bundle mBundleState;
@@ -56,19 +57,19 @@ public class MainActivity extends AppCompatActivity implements PosterViewAdapter
         int numberOfColumns = DisplayUtils.calculateNoOfColumns(this, 185);
 
         adapter = new PosterViewAdapter(this);
-        adapter.setClickListener(this);
+        adapter.setPosterClickListener(this);
+
+        mGridLayoutManager = new GridLayoutManager(this, numberOfColumns);
+        mScrollListener = new EndlessRecyclerViewScrollListener(mGridLayoutManager);
+
+        mScrollListener.setLoadHandler(this);
+
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.addOnScrollListener(mScrollListener);
 
         if (savedInstanceState == null || savedInstanceState.getInt(PAGE_KEY) == 0) {
-            mGridLayoutManager = new GridLayoutManager(this, numberOfColumns);
-            mScrollListener = new EndlessRecyclerViewScrollListener(mGridLayoutManager);
-
-            mScrollListener.setLoadHandler(this);
-
-            mRecyclerView.setLayoutManager(mGridLayoutManager);
-            mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setAdapter(adapter);
-            mRecyclerView.addOnScrollListener(mScrollListener);
-
             loadMore();
         }
 
@@ -144,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements PosterViewAdapter
         mBundleState.putInt(SCROLL_LISTENER_KEY, mScrollListener.saveState());
         mBundleState.putInt(RECYCLER_POSITION_KEY,
                 mGridLayoutManager.findFirstCompletelyVisibleItemPosition());
-        Log.d(TAG, "onPause: " + mBundleState);
     }
 
     @Override
@@ -160,27 +160,31 @@ public class MainActivity extends AppCompatActivity implements PosterViewAdapter
                 currentSort = MovieSort.values()[mBundleState.getInt(SORT_KEY)];
             }
 
-            if (mBundleState.containsKey(RECYCLER_DATA_KEY)) {
+            if (adapter != null && mBundleState.containsKey(RECYCLER_DATA_KEY)) {
                 adapter.restoreState(mBundleState.getParcelableArrayList(RECYCLER_DATA_KEY));
             }
 
-            Parcelable layoutManagerState = mBundleState.getParcelable(LAYOUT_MANAGER_KEY);
+            if (mGridLayoutManager != null) {
+                Parcelable layoutManagerState = mBundleState.getParcelable(LAYOUT_MANAGER_KEY);
 
-            if (layoutManagerState != null) {
-                mGridLayoutManager.onRestoreInstanceState(layoutManagerState);
+                if (layoutManagerState != null) {
+                    mGridLayoutManager.onRestoreInstanceState(layoutManagerState);
+                }
             }
 
-            if (mBundleState.containsKey(SCROLL_LISTENER_KEY)) {
+            if (mScrollListener != null && mBundleState.containsKey(SCROLL_LISTENER_KEY)) {
                 mScrollListener.restoreState(mBundleState.getInt(SCROLL_LISTENER_KEY));
             }
 
-            int position = mBundleState.getInt(RECYCLER_POSITION_KEY);
+            if (mRecyclerView != null) {
+                int position = mBundleState.getInt(RECYCLER_POSITION_KEY);
 
-            if (position == RecyclerView.NO_POSITION) {
-                position = 0;
+                if (position == RecyclerView.NO_POSITION) {
+                    position = 0;
+                }
+
+                mRecyclerView.smoothScrollToPosition(position);
             }
-
-            mRecyclerView.smoothScrollToPosition(position);
         }
     }
 
@@ -194,15 +198,15 @@ public class MainActivity extends AppCompatActivity implements PosterViewAdapter
             currentSort = MovieSort.values()[savedInstanceState.getInt(SORT_KEY)];
         }
 
-        if (savedInstanceState.containsKey(SCROLL_LISTENER_KEY)) {
+        if (mScrollListener != null && savedInstanceState.containsKey(SCROLL_LISTENER_KEY)) {
             mScrollListener.restoreState(savedInstanceState.getInt(SCROLL_LISTENER_KEY));
         }
 
-        if (savedInstanceState.containsKey(RECYCLER_DATA_KEY)) {
+        if (adapter != null && savedInstanceState.containsKey(RECYCLER_DATA_KEY)) {
             adapter.restoreState(savedInstanceState.getParcelableArrayList(RECYCLER_DATA_KEY));
         }
 
-        if (savedInstanceState.containsKey(LAYOUT_MANAGER_KEY)) {
+        if (mGridLayoutManager != null && savedInstanceState.containsKey(LAYOUT_MANAGER_KEY)) {
             Parcelable layoutManagerState = savedInstanceState.getParcelable(LAYOUT_MANAGER_KEY);
 
             if (layoutManagerState != null) {
@@ -210,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements PosterViewAdapter
             }
         }
 
-        if (savedInstanceState.containsKey(RECYCLER_POSITION_KEY)) {
+        if (mRecyclerView != null && savedInstanceState.containsKey(RECYCLER_POSITION_KEY)) {
             int position = savedInstanceState.getInt(RECYCLER_POSITION_KEY);
 
             if (position == RecyclerView.NO_POSITION) {
@@ -233,8 +237,6 @@ public class MainActivity extends AppCompatActivity implements PosterViewAdapter
         outState.putParcelableArrayList(RECYCLER_DATA_KEY, adapter.saveState());
         outState.putInt(RECYCLER_POSITION_KEY, mGridLayoutManager.findFirstCompletelyVisibleItemPosition());
         outState.putParcelable(LAYOUT_MANAGER_KEY, mGridLayoutManager.onSaveInstanceState());
-
-        Log.d(TAG, "onSaveInstanceState: " + outState);
     }
 
     private void captureReferences() {

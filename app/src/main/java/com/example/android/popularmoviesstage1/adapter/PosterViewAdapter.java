@@ -5,7 +5,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +17,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PosterViewAdapter extends ListAdapter<Poster, PosterViewAdapter.ViewHolder> {
+public class PosterViewAdapter extends ListAdapter<Poster, PosterViewHolder> {
     private final List<Poster> mPosters = new ArrayList<>();
     private Context mContext;
     private LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
+    private PosterClickListener mPosterClickListener;
 
     private static final DiffUtil.ItemCallback<Poster> DIFF_CALLBACK = new DiffUtil.ItemCallback<Poster>() {
         @Override
@@ -59,21 +58,22 @@ public class PosterViewAdapter extends ListAdapter<Poster, PosterViewAdapter.Vie
 
     @Override
     @NonNull
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.poster_view_item, parent, false);
-        return new ViewHolder(view);
+        ImageView poster = view.findViewById(R.id.ivPoster);
+        return new PosterViewHolder(view, poster, mPosterClickListener);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull PosterViewHolder viewHolder, int i) {
         Poster poster = getItem(i);
 
         if (poster != null && poster.getPath() != null) {
             Picasso.with(mContext)
                     .load(poster.getFullPath())
-                    .into(viewHolder.mPoster);
+                    .into(viewHolder.getPosterView());
         } else {
-            viewHolder.mPoster.setImageResource(R.drawable.tmdb_logo);
+            viewHolder.getPosterView().setImageResource(R.drawable.tmdb_logo);
         }
     }
 
@@ -95,25 +95,6 @@ public class PosterViewAdapter extends ListAdapter<Poster, PosterViewAdapter.Vie
         return list;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView mPoster;
-
-        ViewHolder(View itemView) {
-            super(itemView);
-            mPoster = itemView.findViewById(R.id.ivPoster);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
-        }
-    }
-
-    public void setClickListener(ItemClickListener itemClickListener) {
-        mClickListener = itemClickListener;
-    }
-
     public void clearData() {
         mPosters.clear();
         submitList(mPosters);
@@ -127,7 +108,7 @@ public class PosterViewAdapter extends ListAdapter<Poster, PosterViewAdapter.Vie
         }
     }
 
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
+    public void setPosterClickListener(PosterClickListener posterClickListener) {
+        mPosterClickListener = posterClickListener;
     }
 }
