@@ -1,9 +1,9 @@
-package com.example.android.popularmoviesstage1.data;
+package com.example.android.popularmoviesstage2.data;
 
 import android.os.AsyncTask;
 
-import com.example.android.popularmoviesstage1.utils.MovieSort;
-import com.example.android.popularmoviesstage1.utils.MovieUtils;
+import com.example.android.popularmoviesstage2.utils.MovieSort;
+import com.example.android.popularmoviesstage2.utils.MovieUtils;
 
 import java.util.ArrayList;
 import java.util.List;

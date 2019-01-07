@@ -1,4 +1,4 @@
-package com.example.android.popularmoviesstage1.adapter;
+package com.example.android.popularmoviesstage2.adapter;
 
 import android.view.View;
 

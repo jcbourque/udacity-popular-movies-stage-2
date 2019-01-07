@@ -1,4 +1,4 @@
-package com.example.android.popularmoviesstage1.adapter;
+package com.example.android.popularmoviesstage2.adapter;
 
 import android.content.Context;
 import android.os.Parcelable;
@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.android.popularmoviesstage1.R;
-import com.example.android.popularmoviesstage1.data.Poster;
+import com.example.android.popularmoviesstage2.data.Poster;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

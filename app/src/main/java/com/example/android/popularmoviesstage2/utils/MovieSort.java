@@ -1,4 +1,4 @@
-package com.example.android.popularmoviesstage1.utils;
+package com.example.android.popularmoviesstage2.utils;
 
 public enum MovieSort {
     MOST_POPULAR("popular"),

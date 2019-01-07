@@ -1,4 +1,4 @@
-package com.example.android.popularmoviesstage1;
+package com.example.android.popularmoviesstage2;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,14 +13,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.popularmoviesstage1.adapter.EndlessRecyclerViewScrollListener;
-import com.example.android.popularmoviesstage1.adapter.PosterClickListener;
-import com.example.android.popularmoviesstage1.adapter.PosterViewAdapter;
-import com.example.android.popularmoviesstage1.data.FetchPosters;
-import com.example.android.popularmoviesstage1.data.Poster;
-import com.example.android.popularmoviesstage1.utils.DisplayUtils;
-import com.example.android.popularmoviesstage1.utils.InternetCheck;
-import com.example.android.popularmoviesstage1.utils.MovieSort;
+import com.example.android.popularmoviesstage1.R;
+import com.example.android.popularmoviesstage2.adapter.EndlessRecyclerViewScrollListener;
+import com.example.android.popularmoviesstage2.adapter.PosterClickListener;
+import com.example.android.popularmoviesstage2.adapter.PosterViewAdapter;
+import com.example.android.popularmoviesstage2.data.FetchPosters;
+import com.example.android.popularmoviesstage2.data.Poster;
+import com.example.android.popularmoviesstage2.utils.DisplayUtils;
+import com.example.android.popularmoviesstage2.utils.InternetCheck;
+import com.example.android.popularmoviesstage2.utils.MovieSort;
 
 import java.util.List;
 

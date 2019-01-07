@@ -1,4 +1,4 @@
-package com.example.android.popularmoviesstage1;
+package com.example.android.popularmoviesstage2;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -11,10 +11,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.popularmoviesstage1.data.FetchMovie;
-import com.example.android.popularmoviesstage1.data.Movie;
-import com.example.android.popularmoviesstage1.data.Poster;
-import com.example.android.popularmoviesstage1.utils.InternetCheck;
+import com.example.android.popularmoviesstage1.R;
+import com.example.android.popularmoviesstage2.data.FetchMovie;
+import com.example.android.popularmoviesstage2.data.Movie;
+import com.example.android.popularmoviesstage2.data.Poster;
+import com.example.android.popularmoviesstage2.utils.InternetCheck;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;

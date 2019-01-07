@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.android.popularmoviesstage2.MainActivity"
             android:label="@string/popular_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,8 +21,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailActivity"
-            android:parentActivityName=".MainActivity"
+            android:name="com.example.android.popularmoviesstage2.DetailActivity"
+            android:parentActivityName="com.example.android.popularmoviesstage2.MainActivity"
             android:label="@string/detail_title" />
     </application>
 

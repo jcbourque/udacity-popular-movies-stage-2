@@ -1,8 +1,8 @@
-package com.example.android.popularmoviesstage1.data;
+package com.example.android.popularmoviesstage2.data;
 
 import android.os.AsyncTask;
 
-import com.example.android.popularmoviesstage1.utils.MovieUtils;
+import com.example.android.popularmoviesstage2.utils.MovieUtils;
 
 public class FetchMovie extends AsyncTask<Integer, Void, Movie> {
     private final Response response;

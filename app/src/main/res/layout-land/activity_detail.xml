@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DetailActivity">
+    tools:context="com.example.android.popularmoviesstage2.DetailActivity">
 
     <TextView
         android:id="@+id/tvDetailTitle"

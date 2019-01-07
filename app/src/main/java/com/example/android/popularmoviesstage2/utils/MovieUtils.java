@@ -1,9 +1,9 @@
-package com.example.android.popularmoviesstage1.utils;
+package com.example.android.popularmoviesstage2.utils;
 
 import android.util.Log;
 
-import com.example.android.popularmoviesstage1.data.Movie;
-import com.example.android.popularmoviesstage1.data.Poster;
+import com.example.android.popularmoviesstage2.data.Movie;
+import com.example.android.popularmoviesstage2.data.Poster;
 
 import java.net.URL;
 import java.util.ArrayList;
