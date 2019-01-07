@@ -1,4 +1,4 @@
-# udacity-popular-movies-stage-1
+# udacity-popular-movies-stage-2
 
 +--------------------------------------------------------------------------+
 | This product uses the TMDb API but is not endorsed or certified by TMDb. |
