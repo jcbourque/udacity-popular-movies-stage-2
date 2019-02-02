@@ -3,10 +3,12 @@
     <string name="app_name">Popular Movies Stage 1</string>
     <string name="popular_title">Popular Movies</string>
     <string name="top_rated_title">Top Rated Movies</string>
+    <string name="favorite_title">Favorite Movies</string>
     <string name="detail_title">Movie Detail</string>
     <string name="poster_content_description">Movie Poster</string>
     <string name="powered_by">Powered by The Movie DB</string>
     <string name="error_message">Unable to retrieve movie data right now</string>
+    <string name="unknown_preference">I\'m confused by your preference</string>
 
     <!--Pluralized Strings-->
     <plurals name="runtime">
@@ -21,4 +23,22 @@
     <!--Menu Items-->
     <string name="menu_popular">View Most Popular</string>
     <string name="menu_top_rated">View Top Rated</string>
+    <string name="menu_settings">Settings</string>
+
+    <!--Tag Ids-->
+    <string name="tag_position_key" translatable="false">tagPositionKey</string>
+    <string name="tag_resource_key" translatable="false">tagResourceKey</string>
+    
+    <!--Preference Strings-->
+    <string name="pref_list_type_label">Movie List to View</string>
+    <string name="pref_list_type_label_popular">Most Popular Movies</string>
+    <string name="pref_list_type_label_top_rated">Top Rated Movies</string>
+    <string name="pref_list_type_label_favorites">Favorite Movies</string>
+    <string name="pref_list_type_value" translatable="false">Movie List</string>
+    <string name="pref_list_type_value_popular" translatable="false">mostPopularMovies</string>
+    <string name="pref_list_type_value_top_rated" translatable="false">topRatedMovies</string>
+    <string name="pref_list_type_value_favorites" translatable="false">favoriteMovies</string>
+
+    <!--Constants-->
+    <string name="date_format" translatable="false">MMMM dd, YYYY</string>
 </resources>

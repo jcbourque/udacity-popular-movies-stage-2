@@ -1,17 +1,30 @@
 package com.example.android.popularmoviesstage2.data;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+@Entity(tableName = "fav")
 public class Poster implements Parcelable {
     public static final String PREFIX = "http://image.tmdb.org/t/p/w185";
 
+    @PrimaryKey
     private int id;
     private String path;
     private String title;
 
+    @Ignore
     public Poster() {}
 
+    public Poster(int id, String path, String title) {
+        this.id = id;
+        this.path = path;
+        this.title = title;
+    }
+
+    @Ignore
     protected Poster(Parcel in) {
         id = in.readInt();
         path = in.readString();

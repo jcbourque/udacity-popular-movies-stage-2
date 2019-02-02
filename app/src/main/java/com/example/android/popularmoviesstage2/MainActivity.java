@@ -1,11 +1,17 @@
 package com.example.android.popularmoviesstage2;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,12 +19,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.popularmoviesstage1.R;
 import com.example.android.popularmoviesstage2.adapter.EndlessRecyclerViewScrollListener;
 import com.example.android.popularmoviesstage2.adapter.PosterClickListener;
 import com.example.android.popularmoviesstage2.adapter.PosterViewAdapter;
 import com.example.android.popularmoviesstage2.data.FetchPosters;
+import com.example.android.popularmoviesstage2.data.MovieDatabase;
 import com.example.android.popularmoviesstage2.data.Poster;
+import com.example.android.popularmoviesstage2.model.PosterViewModel;
+import com.example.android.popularmoviesstage2.utils.AppExecutors;
 import com.example.android.popularmoviesstage2.utils.DisplayUtils;
 import com.example.android.popularmoviesstage2.utils.InternetCheck;
 import com.example.android.popularmoviesstage2.utils.MovieSort;
@@ -26,30 +34,140 @@ import com.example.android.popularmoviesstage2.utils.MovieSort;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PosterClickListener,
-        EndlessRecyclerViewScrollListener.LoadHandler {
-    private static final String TAG = "MainActivity";
+        EndlessRecyclerViewScrollListener.LoadHandler, SharedPreferences.OnSharedPreferenceChangeListener {
     private static Bundle mBundleState;
     private final String LAYOUT_MANAGER_KEY = "layoutManagerState";
     private final String PAGE_KEY = "pageState";
     private final String RECYCLER_DATA_KEY = "recyclerData";
     private final String RECYCLER_POSITION_KEY = "recyclerPositionState";
     private final String SCROLL_LISTENER_KEY = "scrollListenerState";
-    private final String SORT_KEY = "sortKey";
     private PosterViewAdapter adapter;
     private RecyclerView mRecyclerView;
     private GridLayoutManager mGridLayoutManager;
     private EndlessRecyclerViewScrollListener mScrollListener;
     private TextView mErrorMessage;
     private ProgressBar mLoadingIndicator;
-    private MenuItem mMostPopularMenuItem;
-    private MenuItem mTopRatedMenuItem;
+    private PosterViewModel posterViewModel;
     private int page;
-    private MovieSort currentSort = MovieSort.MOST_POPULAR;
+    private MovieDatabase db;
+
+    @Override
+    public void loadMore() {
+        final String pref = getListPreference();
+
+        if (pref.equals(getString(R.string.pref_list_type_value_favorites))) {
+            setTitle(R.string.favorite_title);
+
+            posterViewModel.getPosters().observe(this, new Observer<List<Poster>>() {
+                @Override
+                public void onChanged(@Nullable List<Poster> posters) {
+                    adapter.setData(posters);
+                }
+            });
+
+            return;
+        }
+
+        posterViewModel.getPosters().removeObservers(this);
+
+        final MovieSort sort;
+
+        if (pref.equals(getString(R.string.pref_list_type_value_popular))) {
+            setTitle(R.string.popular_title);
+            sort = MovieSort.MOST_POPULAR;
+        } else if (pref.equals(getString(R.string.pref_list_type_value_top_rated))) {
+            setTitle(R.string.top_rated_title);
+            sort = MovieSort.TOP_RATED;
+        } else {
+            Toast.makeText(this,R.string.unknown_preference, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        new InternetCheck(new InternetCheck.Consumer() {
+            @Override
+            public void accept(boolean internet) {
+                if (internet) {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+
+                    new FetchPosters(++page, new FetchPosters.Response() {
+                        @Override
+                        public void done(List<Poster> posters) {
+                            mLoadingIndicator.setVisibility(View.INVISIBLE);
+
+                            if (posters != null) {
+                                adapter.addPosters(posters);
+                                showData();
+                            } else {
+                                showError();
+                            }
+                        }
+                    }).execute(sort);
+                } else {
+                    showError();
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        return true;
+    }
+
+    public void onFavorite(View view) {
+        final Integer position = (Integer) view.getTag(R.string.tag_position_key);
+        final Integer tag = (Integer) view.getTag(R.string.tag_resource_key);
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (tag != null && tag == R.drawable.ic_fav) {
+                    db.posterDao().unlike(adapter.getPoster(position == null ? 0 : position));
+                } else {
+                    db.posterDao().like(adapter.getPoster(position == null ? 0 : position));
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        Poster poster = adapter.getPoster(position);
+        intent.putExtra(DetailActivity.POSTER, poster);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() != R.id.action_settings) {
+            return super.onOptionsItemSelected(item);
+        }
+
+        startActivity(new Intent(this, SettingsActivity.class));
+
+        page = 0;
+        adapter.clearData();
+//        loadMore();
+        return true;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_list_type_value))) {
+            loadMore();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        db = MovieDatabase.getInstance(getApplicationContext());
+
+        setupViewModel();
         setContentView(R.layout.activity_main);
 
         captureReferences();
@@ -69,72 +187,22 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.addOnScrollListener(mScrollListener);
 
-        if (savedInstanceState == null || savedInstanceState.getInt(PAGE_KEY) == 0) {
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+
+//        if (savedInstanceState == null || savedInstanceState.getInt(PAGE_KEY) == 0) {
             loadMore();
-        }
+//        }
 
         Toast.makeText(this, R.string.powered_by, Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.sort, menu);
+    protected void onDestroy() {
+        super.onDestroy();
 
-        if (mMostPopularMenuItem == null) {
-            mMostPopularMenuItem = menu.findItem(R.id.action_fetch_popular);
-        }
-
-        if (mTopRatedMenuItem == null) {
-            mTopRatedMenuItem = menu.findItem(R.id.action_fetch_top_rated);
-        }
-
-        switch (currentSort) {
-            case MOST_POPULAR:
-                mTopRatedMenuItem.setVisible(true);
-                setTitle(R.string.popular_title);
-                break;
-            case TOP_RATED:
-                mMostPopularMenuItem.setVisible(true);
-                setTitle(R.string.top_rated_title);
-                break;
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.action_fetch_popular:
-                currentSort = MovieSort.MOST_POPULAR;
-                mMostPopularMenuItem.setVisible(false);
-                mTopRatedMenuItem.setVisible(true);
-                setTitle(R.string.popular_title);
-                break;
-            case R.id.action_fetch_top_rated:
-                currentSort = MovieSort.TOP_RATED;
-                mTopRatedMenuItem.setVisible(false);
-                mMostPopularMenuItem.setVisible(true);
-                setTitle(R.string.top_rated_title);
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-        page = 0;
-        adapter.clearData();
-        loadMore();
-        return true;
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        Intent intent = new Intent(this, DetailActivity.class);
-        Poster poster = adapter.getPoster(position);
-        intent.putExtra(DetailActivity.POSTER, poster);
-        startActivity(intent);
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -143,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
 
         mBundleState = new Bundle();
         mBundleState.putInt(PAGE_KEY, page);
-        mBundleState.putInt(SORT_KEY, currentSort.ordinal());
         mBundleState.putParcelableArrayList(RECYCLER_DATA_KEY, adapter.saveState());
         mBundleState.putParcelable(LAYOUT_MANAGER_KEY, mGridLayoutManager.onSaveInstanceState());
         mBundleState.putInt(SCROLL_LISTENER_KEY, mScrollListener.saveState());
@@ -158,10 +225,6 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         if (mBundleState != null) {
             if (mBundleState.containsKey(PAGE_KEY)) {
                 page = mBundleState.getInt(PAGE_KEY);
-            }
-
-            if (mBundleState.containsKey(SORT_KEY)) {
-                currentSort = MovieSort.values()[mBundleState.getInt(SORT_KEY)];
             }
 
             if (adapter != null && mBundleState.containsKey(RECYCLER_DATA_KEY)) {
@@ -198,10 +261,6 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
             page = savedInstanceState.getInt(PAGE_KEY);
         }
 
-        if (savedInstanceState.containsKey(SORT_KEY)) {
-            currentSort = MovieSort.values()[savedInstanceState.getInt(SORT_KEY)];
-        }
-
         if (mScrollListener != null && savedInstanceState.containsKey(SCROLL_LISTENER_KEY)) {
             mScrollListener.restoreState(savedInstanceState.getInt(SCROLL_LISTENER_KEY));
         }
@@ -236,7 +295,6 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         super.onSaveInstanceState(outState);
 
         outState.putInt(PAGE_KEY, page);
-        outState.putInt(SORT_KEY, currentSort.ordinal());
         outState.putInt(SCROLL_LISTENER_KEY, mScrollListener.saveState());
         outState.putParcelableArrayList(RECYCLER_DATA_KEY, adapter.saveState());
         outState.putInt(RECYCLER_POSITION_KEY, mGridLayoutManager.findFirstCompletelyVisibleItemPosition());
@@ -249,6 +307,16 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         mLoadingIndicator = findViewById(R.id.pbLoadingIndicator);
     }
 
+    private String getListPreference() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getString(getString(R.string.pref_list_type_value),
+                getString(R.string.pref_list_type_value_popular));
+    }
+
+    private void setupViewModel() {
+        posterViewModel = ViewModelProviders.of(this).get(PosterViewModel.class);
+    }
+
     private void showData() {
         mErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
@@ -257,33 +325,5 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
     private void showError() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessage.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void loadMore() {
-        new InternetCheck(new InternetCheck.Consumer() {
-            @Override
-            public void accept(boolean internet) {
-                if (internet) {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-
-                    new FetchPosters(++page, new FetchPosters.Response() {
-                        @Override
-                        public void done(List<Poster> posters) {
-                            mLoadingIndicator.setVisibility(View.INVISIBLE);
-
-                            if (posters != null) {
-                                adapter.addPosters(posters);
-                                showData();
-                            } else {
-                                showError();
-                            }
-                        }
-                    }).execute(currentSort);
-                } else {
-                    showError();
-                }
-            }
-        });
     }
 }

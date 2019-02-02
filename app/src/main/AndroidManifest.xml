@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.android.popularmoviesstage1">
+    package="com.example.android.popularmoviesstage2">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -13,17 +13,27 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.example.android.popularmoviesstage2.MainActivity"
-            android:label="@string/popular_title">
+            android:label="@string/popular_title"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.example.android.popularmoviesstage2.DetailActivity"
-            android:parentActivityName="com.example.android.popularmoviesstage2.MainActivity"
-            android:label="@string/detail_title" />
+            android:label="@string/detail_title"
+            android:parentActivityName="com.example.android.popularmoviesstage2.MainActivity" />
+
+        <activity android:name="com.example.android.popularmoviesstage2.SettingsActivity"
+            android:label="@string/menu_settings"
+            android:parentActivityName="com.example.android.popularmoviesstage2.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.popularmoviesstage2.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
