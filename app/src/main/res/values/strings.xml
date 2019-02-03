@@ -46,4 +46,5 @@
 
     <!--Constants-->
     <string name="date_format" translatable="false">MMMM dd, YYYY</string>
+    <string name="youtube" translatable="false">YouTube</string>
 </resources>

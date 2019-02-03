@@ -313,7 +313,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             parent.addView(sectionHeader);
 
             for (Video video : movie.getVideos()) {
-                if ("YouTube".equalsIgnoreCase(video.getSite())) {
+                if (video.getSite().equalsIgnoreCase(getString(R.string.youtube))) {
                     LinearLayout videoLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.videos, null);
 
                     ImageView ivPlay = videoLayout.findViewById(R.id.ivVideoPlay);
