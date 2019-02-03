@@ -7,8 +7,12 @@
     <string name="detail_title">Movie Detail</string>
     <string name="poster_content_description">Movie Poster</string>
     <string name="powered_by">Powered by The Movie DB</string>
+    <string name="empty_message">You have not marked any movies as favorites yet!</string>
     <string name="error_message">Unable to retrieve movie data right now</string>
     <string name="unknown_preference">I\'m confused by your preference</string>
+    <string name="video">video</string>
+    <string name="section_header_videos">Trailers</string>
+    <string name="section_header_reviews">Reviews</string>
 
     <!--Pluralized Strings-->
     <plurals name="runtime">

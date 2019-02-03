@@ -27,6 +27,7 @@ public class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollList
 
             if (totalItemCount == 0) {
                 loading = true;
+                layoutManager.scrollToPosition(0);
             }
         }
 
@@ -39,6 +40,11 @@ public class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollList
             loading = true;
             loadMore();
         }
+    }
+
+    public void reset() {
+        loading = false;
+        previousTotalItemCount = 0;
     }
 
     public void restoreState(int state) {

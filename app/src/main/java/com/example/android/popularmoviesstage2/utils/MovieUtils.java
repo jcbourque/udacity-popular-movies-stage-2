@@ -17,6 +17,18 @@ public class MovieUtils {
 
         URL movieURL = NetUtils.getMovieURL(id);
 
+        NetUtils.getResponseFromHttpUrl(movieURL, new NetCallback() {
+            @Override
+            public void done(String response) {
+
+            }
+
+            @Override
+            public void error(Exception e) {
+
+            }
+        });
+
         try {
             movie = JsonUtils.parseMovie(NetUtils.getResponseFromHttpUrl(movieURL));
         } catch (Exception e) {

@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.android.popularmoviesstage2.DetailActivity">
 
-    <TextView
-        android:id="@+id/tvDetailTitle"
-        android:layout_width="match_parent"
-        android:layout_height="128dp"
-        android:background="@color/colorPrimaryDark"
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/padding_normal"
-        android:paddingRight="@dimen/padding_normal"
-        android:textColor="@color/colorPrimaryLight"
-        android:textSize="30sp" />
-
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/llContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/padding_normal"
-        android:paddingBottom="@dimen/padding_normal">
+        android:orientation="vertical">
 
-        <include layout="@layout/poster" />
+        <TextView
+            android:id="@+id/tvDetailTitle"
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/padding_normal"
+            android:paddingRight="@dimen/padding_normal"
+            android:textColor="@color/colorPrimaryLight"
+            android:textSize="30sp" />
 
-        <include layout="@layout/movie_metadata" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/padding_normal"
+            android:paddingBottom="@dimen/padding_normal">
+
+            <include layout="@layout/poster" />
+
+            <include layout="@layout/movie_metadata" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_thickness"
+            android:background="?android:attr/listDivider" />
+
+        <include layout="@layout/synopsis" />
 
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_thickness"
-        android:background="?android:attr/listDivider" />
-
-    <include layout="@layout/synopsis" />
-
-</LinearLayout>
+</ScrollView>

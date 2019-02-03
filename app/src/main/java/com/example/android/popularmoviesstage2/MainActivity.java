@@ -1,17 +1,14 @@
 package com.example.android.popularmoviesstage2;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +22,8 @@ import com.example.android.popularmoviesstage2.adapter.PosterViewAdapter;
 import com.example.android.popularmoviesstage2.data.FetchPosters;
 import com.example.android.popularmoviesstage2.data.MovieDatabase;
 import com.example.android.popularmoviesstage2.data.Poster;
+import com.example.android.popularmoviesstage2.data.PosterObserver;
+import com.example.android.popularmoviesstage2.data.ShowData;
 import com.example.android.popularmoviesstage2.model.PosterViewModel;
 import com.example.android.popularmoviesstage2.utils.AppExecutors;
 import com.example.android.popularmoviesstage2.utils.DisplayUtils;
@@ -34,7 +33,8 @@ import com.example.android.popularmoviesstage2.utils.MovieSort;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PosterClickListener,
-        EndlessRecyclerViewScrollListener.LoadHandler, SharedPreferences.OnSharedPreferenceChangeListener {
+        EndlessRecyclerViewScrollListener.LoadHandler, ShowData,
+        SharedPreferences.OnSharedPreferenceChangeListener {
     private static Bundle mBundleState;
     private final String LAYOUT_MANAGER_KEY = "layoutManagerState";
     private final String PAGE_KEY = "pageState";
@@ -45,9 +45,11 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
     private RecyclerView mRecyclerView;
     private GridLayoutManager mGridLayoutManager;
     private EndlessRecyclerViewScrollListener mScrollListener;
+    private TextView mEmptyMessage;
     private TextView mErrorMessage;
     private ProgressBar mLoadingIndicator;
     private PosterViewModel posterViewModel;
+    private PosterObserver posterObserver;
     private int page;
     private MovieDatabase db;
 
@@ -58,17 +60,16 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         if (pref.equals(getString(R.string.pref_list_type_value_favorites))) {
             setTitle(R.string.favorite_title);
 
-            posterViewModel.getPosters().observe(this, new Observer<List<Poster>>() {
-                @Override
-                public void onChanged(@Nullable List<Poster> posters) {
-                    adapter.setData(posters);
-                }
-            });
+            if (posterViewModel.getPosters().hasObservers()) {
+                adapter.setData(posterViewModel.getPosters().getValue());
+            } else {
+                posterViewModel.getPosters().observe(this, posterObserver);
+            }
 
             return;
         }
 
-        posterViewModel.getPosters().removeObservers(this);
+        posterViewModel.getPosters().removeObserver(posterObserver);
 
         final MovieSort sort;
 
@@ -112,21 +113,21 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
         return true;
     }
 
     public void onFavorite(View view) {
         final Integer position = (Integer) view.getTag(R.string.tag_position_key);
         final Integer tag = (Integer) view.getTag(R.string.tag_resource_key);
+        final Poster poster = adapter.getPoster(position == null ? 0 : position);
 
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
                 if (tag != null && tag == R.drawable.ic_fav) {
-                    db.posterDao().unlike(adapter.getPoster(position == null ? 0 : position));
+                    db.posterDao().unlike(poster);
                 } else {
-                    db.posterDao().like(adapter.getPoster(position == null ? 0 : position));
+                    db.posterDao().like(poster);
                 }
             }
         });
@@ -147,18 +148,29 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         }
 
         startActivity(new Intent(this, SettingsActivity.class));
+        resetAdapterData();
 
-        page = 0;
-        adapter.clearData();
-//        loadMore();
         return true;
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.pref_list_type_value))) {
-            loadMore();
-        }
+        resetAdapterData();
+        loadMore();
+    }
+
+    @Override
+    public void showData() {
+        mEmptyMessage.setVisibility(View.INVISIBLE);
+        mErrorMessage.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showEmpty() {
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mErrorMessage.setVisibility(View.INVISIBLE);
+        mEmptyMessage.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -187,12 +199,12 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.addOnScrollListener(mScrollListener);
 
+        setupObserver();
+
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
 
-//        if (savedInstanceState == null || savedInstanceState.getInt(PAGE_KEY) == 0) {
-            loadMore();
-//        }
+        loadMore();
 
         Toast.makeText(this, R.string.powered_by, Toast.LENGTH_LONG).show();
     }
@@ -303,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
 
     private void captureReferences() {
         mRecyclerView = findViewById(R.id.rvPosters);
+        mEmptyMessage = findViewById(R.id.tvEmptyMessage);
         mErrorMessage = findViewById(R.id.tvErrorMessage);
         mLoadingIndicator = findViewById(R.id.pbLoadingIndicator);
     }
@@ -313,17 +326,23 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
                 getString(R.string.pref_list_type_value_popular));
     }
 
+    private void resetAdapterData() {
+        adapter.clearData();
+        page = 0;
+        mScrollListener.reset();
+    }
+
+    private void setupObserver() {
+        posterObserver = new PosterObserver(adapter, this);
+    }
+
     private void setupViewModel() {
         posterViewModel = ViewModelProviders.of(this).get(PosterViewModel.class);
     }
 
-    private void showData() {
-        mErrorMessage.setVisibility(View.INVISIBLE);
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
     private void showError() {
         mRecyclerView.setVisibility(View.INVISIBLE);
+        mEmptyMessage.setVisibility(View.INVISIBLE);
         mErrorMessage.setVisibility(View.VISIBLE);
     }
 }

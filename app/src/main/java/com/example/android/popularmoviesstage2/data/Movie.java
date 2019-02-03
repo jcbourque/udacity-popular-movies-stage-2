@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesstage2.data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class Movie {
     private String overview;
     private Date releaseDate;
     private int runTime;
+    private List<Video> videos;
+    private List<Review> reviews;
 
     public int getVoteCount() {
         return voteCount;
@@ -138,5 +141,29 @@ public class Movie {
 
     public void setRunTime(int runTime) {
         this.runTime = runTime;
+    }
+
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public boolean hasVideos() {
+        return videos != null && !videos.isEmpty();
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public boolean hasReviews() {
+        return reviews != null && !reviews.isEmpty();
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

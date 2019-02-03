@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.util.DiffUtil;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PosterViewAdapter extends ListAdapter<Poster, PosterViewHolder> {
-    private static final String TAG = "PosterViewAdapter";
     private final List<Poster> mPosters = new ArrayList<>();
     private Context mContext;
     private LayoutInflater mInflater;
@@ -134,6 +132,7 @@ public class PosterViewAdapter extends ListAdapter<Poster, PosterViewHolder> {
         if (data != null) {
             mPosters.clear();
             addPosters(data);
+            notifyDataSetChanged();
         }
     }
 

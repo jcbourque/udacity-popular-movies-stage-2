@@ -126,7 +126,6 @@ public class NetUtils {
         }
     }
 
-    // TODO Test out this method later
     public static void getResponseFromHttpUrl(final URL url, final NetCallback callback) {
         if (callback != null) {
             AppExecutors.getInstance().networkIO().execute(new Runnable() {

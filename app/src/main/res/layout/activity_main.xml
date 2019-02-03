@@ -17,6 +17,15 @@
         android:visibility="invisible" />
 
     <TextView
+        android:id="@+id/tvEmptyMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_normal"
+        android:text="@string/empty_message"
+        android:textSize="@dimen/text_medium"
+        android:visibility="invisible" />
+
+    <TextView
         android:id="@+id/tvErrorMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
