@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-public class NetUtils {
+public final class NetUtils {
     private static final String TAG = "NetUtils";
     private static final String SECURE_SCHEME = "https";
     private static final String MOVIE_SITE = "api.themoviedb.org";

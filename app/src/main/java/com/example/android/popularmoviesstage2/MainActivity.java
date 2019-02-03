@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.example.android.popularmoviesstage2.adapter.EndlessRecyclerViewScrollListener;
 import com.example.android.popularmoviesstage2.adapter.PosterClickListener;
 import com.example.android.popularmoviesstage2.adapter.PosterViewAdapter;
-import com.example.android.popularmoviesstage2.data.FetchPosters;
 import com.example.android.popularmoviesstage2.data.MovieDatabase;
 import com.example.android.popularmoviesstage2.data.Poster;
 import com.example.android.popularmoviesstage2.data.PosterObserver;
@@ -28,9 +27,10 @@ import com.example.android.popularmoviesstage2.model.PosterViewModel;
 import com.example.android.popularmoviesstage2.utils.AppExecutors;
 import com.example.android.popularmoviesstage2.utils.DisplayUtils;
 import com.example.android.popularmoviesstage2.utils.InternetCheck;
+import com.example.android.popularmoviesstage2.utils.JsonUtils;
 import com.example.android.popularmoviesstage2.utils.MovieSort;
-
-import java.util.List;
+import com.example.android.popularmoviesstage2.utils.NetCallback;
+import com.example.android.popularmoviesstage2.utils.NetUtils;
 
 public class MainActivity extends AppCompatActivity implements PosterClickListener,
         EndlessRecyclerViewScrollListener.LoadHandler, ShowData,
@@ -90,19 +90,30 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
                 if (internet) {
                     mLoadingIndicator.setVisibility(View.VISIBLE);
 
-                    new FetchPosters(++page, new FetchPosters.Response() {
+                    NetUtils.getResponseFromHttpUrl(NetUtils.getPostersURL(sort, ++page), new NetCallback() {
                         @Override
-                        public void done(List<Poster> posters) {
-                            mLoadingIndicator.setVisibility(View.INVISIBLE);
-
-                            if (posters != null) {
-                                adapter.addPosters(posters);
-                                showData();
-                            } else {
-                                showError();
-                            }
+                        public void done(final String response) {
+                            AppExecutors.getInstance().mainThread().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.addPosters(JsonUtils.parsePosters(response));
+                                    mLoadingIndicator.setVisibility(View.INVISIBLE);
+                                    showData();
+                                }
+                            });
                         }
-                    }).execute(sort);
+
+                        @Override
+                        public void error(Exception e) {
+                            AppExecutors.getInstance().mainThread().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mLoadingIndicator.setVisibility(View.INVISIBLE);
+                                    showError();
+                                }
+                            });
+                        }
+                    });
                 } else {
                     showError();
                 }
@@ -137,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
     public void onItemClick(View view, int position) {
         Intent intent = new Intent(this, DetailActivity.class);
         Poster poster = adapter.getPoster(position);
-        intent.putExtra(DetailActivity.POSTER, poster);
+        intent.putExtra(getString(R.string.intent_poster), poster);
         startActivity(intent);
     }
 

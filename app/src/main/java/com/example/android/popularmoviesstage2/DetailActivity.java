@@ -29,15 +29,13 @@ import com.example.android.popularmoviesstage2.utils.NetCallback;
 import com.example.android.popularmoviesstage2.utils.NetUtils;
 import com.squareup.picasso.Picasso;
 
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
-    public static final String POSTER = "poster";
-
     private MovieDatabase db;
+
+    private Bundle mBundleState;
 
     private Poster poster;
     private Movie movie;
@@ -91,22 +89,76 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         setupActionBar();
 
         Intent intent = getIntent();
+        String posterIntentKey = getString(R.string.intent_poster);
 
-        if (intent == null || !intent.hasExtra(POSTER)) {
+        if (intent == null || !intent.hasExtra(posterIntentKey)) {
             closeOnError();
             return;
         }
 
-        poster = intent.getParcelableExtra(POSTER);
+        poster = intent.getParcelableExtra(posterIntentKey);
 
         if (poster == null) {
             closeOnError();
             return;
         }
 
+        if (savedInstanceState != null) {
+            String movieBundleKey = getString(R.string.bundle_movie);
+
+            if (savedInstanceState.containsKey(movieBundleKey)) {
+                movie = savedInstanceState.getParcelable(movieBundleKey);
+
+                if (movie != null && movie.getId() != poster.getId()) {
+                    movie = null;
+                }
+            }
+        }
+
         captureViews();
         fetchMovie();
         observeFavorite();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (movie != null) {
+            mBundleState = new Bundle();
+            mBundleState.putParcelable(getString(R.string.bundle_movie), movie);
+        }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+
+        String movieBundleKey = getString(R.string.bundle_movie);
+
+        if (mBundleState != null && mBundleState.containsKey(movieBundleKey)) {
+            movie = mBundleState.getParcelable(movieBundleKey);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        String movieBundleKey = getString(R.string.bundle_movie);
+
+        if (savedInstanceState.containsKey(movieBundleKey)) {
+            movie = savedInstanceState.getParcelable(movieBundleKey);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (movie != null) {
+            outState.putParcelable(getString(R.string.bundle_movie), movie);
+        }
     }
 
     private void captureViews() {
@@ -127,6 +179,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void fetchMovie() {
+        if (movie != null) {
+            populateUI();
+            return;
+        }
+
         mTitle.setText(poster.getTitle());
 
         new InternetCheck(new InternetCheck.Consumer() {
@@ -161,6 +218,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void fetchReviews() {
+        if (movie != null && movie.hasReviews()) {
+            populateReviews();
+            return;
+        }
+
         new InternetCheck(new InternetCheck.Consumer() {
             @Override
             public void accept(boolean internet) {
@@ -188,6 +250,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void fetchVideos() {
+        if (movie != null && movie.hasVideos()) {
+            populateVideos();
+            return;
+        }
+
         new InternetCheck(new InternetCheck.Consumer() {
             @Override
             public void accept(boolean internet) {

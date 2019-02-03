@@ -6,7 +6,7 @@ import android.os.Looper;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class AppExecutors {
+public final class AppExecutors {
     private static final Object LOCK = new Object();
 
     private static AppExecutors instance;
@@ -29,7 +29,7 @@ public class AppExecutors {
         return instance;
     }
 
-    public AppExecutors(Executor diskIO, Executor networkIO, Executor mainThread) {
+    private AppExecutors(Executor diskIO, Executor networkIO, Executor mainThread) {
         this.diskIO = diskIO;
         this.networkIO = networkIO;
         this.mainThread = mainThread;

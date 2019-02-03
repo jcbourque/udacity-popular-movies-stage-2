@@ -47,4 +47,6 @@
     <!--Constants-->
     <string name="date_format" translatable="false">MMMM dd, YYYY</string>
     <string name="youtube" translatable="false">YouTube</string>
+    <string name="intent_poster" translatable="false">intentPoster</string>
+    <string name="bundle_movie" translatable="false">bundleMovie</string>
 </resources>

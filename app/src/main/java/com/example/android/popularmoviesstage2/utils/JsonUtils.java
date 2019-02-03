@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class JsonUtils
+public final class JsonUtils
 {
     private static final String TAG = "JsonUtils";
 
@@ -192,18 +192,6 @@ public class JsonUtils
         if (array != null) {
             for (int i = 0; i < array.length(); i++) {
                 list.add(array.optInt(i));
-            }
-        }
-
-        return list;
-    }
-
-    public static List<String> toStringList(JSONArray array) {
-        List<String> list = new ArrayList<>();
-
-        if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-                list.add(array.optString(i));
             }
         }
 
