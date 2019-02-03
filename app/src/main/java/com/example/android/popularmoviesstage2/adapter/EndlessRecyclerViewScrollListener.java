@@ -47,12 +47,31 @@ public class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollList
         previousTotalItemCount = 0;
     }
 
-    public void restoreState(int state) {
-        previousTotalItemCount = state;
+    public void restoreState(String state) {
+        String[] tokens = state.split("~");
+
+        int position = -1, itemCount = -1;
+
+        if (tokens.length == 2) {
+            try {
+                position = Integer.parseInt(tokens[0]);
+            } catch (Exception ignore) {}
+            try {
+                itemCount = Integer.parseInt(tokens[1]);
+            } catch (Exception ignore) {}
+        }
+
+        if (position > -1) {
+            layoutManager.scrollToPosition(position);
+        }
+
+        if (itemCount > -1) {
+            previousTotalItemCount = itemCount;
+        }
     }
 
-    public int saveState() {
-        return previousTotalItemCount;
+    public String saveState() {
+        return layoutManager.findFirstVisibleItemPosition() + "~" + previousTotalItemCount;
     }
 
     public void setLoadHandler(LoadHandler loadHandler) {

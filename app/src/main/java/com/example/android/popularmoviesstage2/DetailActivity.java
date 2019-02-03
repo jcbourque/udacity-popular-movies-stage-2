@@ -33,10 +33,9 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
+    private static Bundle mBundleState;
+
     private MovieDatabase db;
-
-    private Bundle mBundleState;
-
     private Poster poster;
     private Movie movie;
 

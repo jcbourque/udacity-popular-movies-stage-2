@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         mBundleState.putInt(PAGE_KEY, page);
         mBundleState.putParcelableArrayList(RECYCLER_DATA_KEY, adapter.saveState());
         mBundleState.putParcelable(LAYOUT_MANAGER_KEY, mGridLayoutManager.onSaveInstanceState());
-        mBundleState.putInt(SCROLL_LISTENER_KEY, mScrollListener.saveState());
+        mBundleState.putString(SCROLL_LISTENER_KEY, mScrollListener.saveState());
         mBundleState.putInt(RECYCLER_POSITION_KEY,
                 mGridLayoutManager.findFirstCompletelyVisibleItemPosition());
     }
@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
             }
 
             if (mScrollListener != null && mBundleState.containsKey(SCROLL_LISTENER_KEY)) {
-                mScrollListener.restoreState(mBundleState.getInt(SCROLL_LISTENER_KEY));
+                mScrollListener.restoreState(mBundleState.getString(SCROLL_LISTENER_KEY));
             }
 
             if (mRecyclerView != null) {
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         }
 
         if (mScrollListener != null && savedInstanceState.containsKey(SCROLL_LISTENER_KEY)) {
-            mScrollListener.restoreState(savedInstanceState.getInt(SCROLL_LISTENER_KEY));
+            mScrollListener.restoreState(savedInstanceState.getString(SCROLL_LISTENER_KEY));
         }
 
         if (adapter != null && savedInstanceState.containsKey(RECYCLER_DATA_KEY)) {
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements PosterClickListen
         super.onSaveInstanceState(outState);
 
         outState.putInt(PAGE_KEY, page);
-        outState.putInt(SCROLL_LISTENER_KEY, mScrollListener.saveState());
+        outState.putString(SCROLL_LISTENER_KEY, mScrollListener.saveState());
         outState.putParcelableArrayList(RECYCLER_DATA_KEY, adapter.saveState());
         outState.putInt(RECYCLER_POSITION_KEY, mGridLayoutManager.findFirstCompletelyVisibleItemPosition());
         outState.putParcelable(LAYOUT_MANAGER_KEY, mGridLayoutManager.onSaveInstanceState());
