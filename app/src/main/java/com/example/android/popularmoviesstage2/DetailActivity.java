@@ -4,17 +4,14 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +29,12 @@ import com.example.android.popularmoviesstage2.utils.NetCallback;
 import com.example.android.popularmoviesstage2.utils.NetUtils;
 import com.squareup.picasso.Picasso;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String POSTER = "poster";
 
     private MovieDatabase db;
@@ -54,6 +53,16 @@ public class DetailActivity extends AppCompatActivity {
     private TextView mSynopsis;
 
     private SimpleDateFormat simpleDateFormat;
+
+    @Override
+    public void onClick(View v) {
+        String key = (String) v.getTag(R.string.tag_video_key);
+
+        Uri uri = NetUtils.getYouTubeUri(key);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
 
     public void onFavorite(View view) {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -306,6 +315,10 @@ public class DetailActivity extends AppCompatActivity {
             for (Video video : movie.getVideos()) {
                 if ("YouTube".equalsIgnoreCase(video.getSite())) {
                     LinearLayout videoLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.videos, null);
+
+                    ImageView ivPlay = videoLayout.findViewById(R.id.ivVideoPlay);
+                    ivPlay.setTag(R.string.tag_video_key, video.getKey());
+                    ivPlay.setOnClickListener(this);
 
                     TextView tvName = videoLayout.findViewById(R.id.tvVideoName);
                     tvName.setText(video.getName());

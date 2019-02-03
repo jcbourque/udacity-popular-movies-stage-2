@@ -11,7 +11,7 @@
     <string name="error_message">Unable to retrieve movie data right now</string>
     <string name="unknown_preference">I\'m confused by your preference</string>
     <string name="video">video</string>
-    <string name="section_header_videos">Trailers</string>
+    <string name="section_header_videos">Trailers &amp; Related Videos</string>
     <string name="section_header_reviews">Reviews</string>
 
     <!--Pluralized Strings-->
@@ -32,6 +32,7 @@
     <!--Tag Ids-->
     <string name="tag_position_key" translatable="false">tagPositionKey</string>
     <string name="tag_resource_key" translatable="false">tagResourceKey</string>
+    <string name="tag_video_key" translatable="false">tagVideoKey</string>
     
     <!--Preference Strings-->
     <string name="pref_list_type_label">Movie List to View</string>

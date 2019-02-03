@@ -100,15 +100,13 @@ public class NetUtils {
         return toURL(uri, "getVideosURL");
     }
 
-    public static URL getYouTubeURL(String videoKey) {
+    public static Uri getYouTubeUri(String videoKey) {
         Uri.Builder builder = new Uri.Builder();
 
-        Uri uri = builder.scheme(SECURE_SCHEME)
+        return builder.scheme(SECURE_SCHEME)
                 .authority(YOU_TUBE_SITE)
                 .appendPath(YOU_TUBE_PATH)
                 .appendQueryParameter(VIDEO_QUERY_PARAM, videoKey).build();
-
-        return toURL(uri, "getYouTubeURL");
     }
 
     public static String getResponseFromHttpUrl(URL url) throws IOException {
