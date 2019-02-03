@@ -43,7 +43,7 @@ public final class JsonUtils
             movie.setBackdropPath(data.optString("backdrop_path"));
             movie.setAdult(data.optBoolean("adult"));
             movie.setOverview(data.optString("overview"));
-            movie.setReleaseDate(toDate(data.optString("release_date"), "yyyy-MM-dd"));
+            movie.setReleaseDate(toDate(data.optString("release_date")));
             movie.setRunTime(data.optInt("runtime"));
         } catch (JSONException e) {
             Log.e(TAG, "parseMovie: Unable to parse movie", e);
@@ -51,25 +51,6 @@ public final class JsonUtils
         }
 
         return movie;
-    }
-
-    public static Poster parsePoster(String json) {
-        Poster poster;
-
-        try {
-            JSONObject data = new JSONObject(json);
-
-            poster = new Poster();
-
-            poster.setId(data.optInt("id"));
-            poster.setPath(data.optString("poster_path"));
-            poster.setTitle(data.optString("title"));
-        } catch (JSONException e) {
-            Log.e(TAG, "parsePoster: Unable to parse poster", e);
-            poster = null;
-        }
-
-        return poster;
     }
 
     public static List<Poster> parsePosters(String json) {
@@ -91,26 +72,6 @@ public final class JsonUtils
         return posters;
     }
 
-    public static Review parseReview(String json) {
-        Review review;
-
-        try {
-            JSONObject data = new JSONObject(json);
-
-            review = new Review();
-
-            review.setId(data.optString("id"));
-            review.setAuthor(data.optString("author"));
-            review.setContent(data.optString("content"));
-            review.setUrl(data.optString("url"));
-        } catch (JSONException e) {
-            Log.e(TAG, "parseVideo: Unable to parse video", e);
-            review = null;
-        }
-
-        return review;
-    }
-
     public static List<Review> parseReviews(String json) {
         List<Review> reviews = new ArrayList<>();
 
@@ -130,7 +91,67 @@ public final class JsonUtils
         return reviews;
     }
 
-    public static Video parseVideo(String json) {
+    public static List<Video> parseVideos(String json) {
+        List<Video> videos = new ArrayList<>();
+
+        try {
+            JSONObject data = new JSONObject(json);
+            JSONArray results = data.optJSONArray("results");
+
+            if (results != null) {
+                for (int i = 0; i < results.length(); i++) {
+                    videos.add(parseVideo(results.optString(i)));
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "parseVideos: Unable to parse videos", e);
+        }
+
+        return videos;
+    }
+
+    private JsonUtils() {}
+
+    private static Poster parsePoster(String json) {
+        Poster poster;
+
+        try {
+            JSONObject data = new JSONObject(json);
+
+            poster = new Poster();
+
+            poster.setId(data.optInt("id"));
+            poster.setPath(data.optString("poster_path"));
+            poster.setTitle(data.optString("title"));
+        } catch (JSONException e) {
+            Log.e(TAG, "parsePoster: Unable to parse poster", e);
+            poster = null;
+        }
+
+        return poster;
+    }
+
+    private static Review parseReview(String json) {
+        Review review;
+
+        try {
+            JSONObject data = new JSONObject(json);
+
+            review = new Review();
+
+            review.setId(data.optString("id"));
+            review.setAuthor(data.optString("author"));
+            review.setContent(data.optString("content"));
+            review.setUrl(data.optString("url"));
+        } catch (JSONException e) {
+            Log.e(TAG, "parseVideo: Unable to parse video", e);
+            review = null;
+        }
+
+        return review;
+    }
+
+    private static Video parseVideo(String json) {
         Video video;
 
         try {
@@ -154,30 +175,11 @@ public final class JsonUtils
         return video;
     }
 
-    public static List<Video> parseVideos(String json) {
-        List<Video> videos = new ArrayList<>();
-
-        try {
-            JSONObject data = new JSONObject(json);
-            JSONArray results = data.optJSONArray("results");
-
-            if (results != null) {
-                for (int i = 0; i < results.length(); i++) {
-                    videos.add(parseVideo(results.optString(i)));
-                }
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, "parseVideos: Unable to parse videos", e);
-        }
-
-        return videos;
-    }
-
-    public static Date toDate(String value, String pattern) {
+    private static Date toDate(String value) {
         Date date = null;
 
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.US);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
             date = sdf.parse(value);
         } catch (Exception e) {
             Log.e(TAG, "toDate: A parsing exception has occurred", e);
@@ -186,7 +188,7 @@ public final class JsonUtils
         return date;
     }
 
-    public static List<Integer> toIntList(JSONArray array) {
+    private static List<Integer> toIntList(JSONArray array) {
         List<Integer> list = new ArrayList<>();
 
         if (array != null) {
@@ -197,6 +199,4 @@ public final class JsonUtils
 
         return list;
     }
-
-    private JsonUtils() {}
 }
